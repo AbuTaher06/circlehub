@@ -6,9 +6,11 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 
 // Home and User Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -22,21 +24,41 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // Authenticated Routes Group
 Route::middleware('auth')->group(function () {
     // Profile Routes
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Add this route to handle friend requests
+   // Add this route to handle friend requests
+
+
+Route::post('/friends/{user}/add', [ProfileController::class, 'addFriend'])->name('friend.add');
+Route::post('/friends/{id}/confirm', [ProfileController::class, 'confirmRequest'])->name('friend.confirm');
+Route::delete('/friends/{id}/delete', [ProfileController::class, 'deleteRequest'])->name('friend.delete');
+
+// routes/web.php
+Route::get('/notifications', [ProfileController::class, 'showNotifications'])->name('notifications');
+
+
+
+
     // Post Routes
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/show', [PostController::class, 'index'])->name('posts.show');
+    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     // Like Routes
     Route::post('/likes/{post}/toggle', [LikeController::class, 'toggle'])->name('likes.toggle');
+
     // Share Routes
     Route::post('/posts/{postId}/shares', [ShareController::class, 'store'])->name('shares.store');
 
     // Comment Routes
     Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
 });
 
 // Authentication Routes (Login, Registration, etc.)

@@ -25,10 +25,15 @@
                 <a href="#" class="hover:text-gray-300 flex items-center space-x-2">
                     <i class="fas fa-envelope"></i>
                 </a>
-                <a href="#" class="hover:text-gray-300 flex items-center space-x-2">
+                <a href="{{ route('notifications') }}" class="hover:text-gray-300 flex items-center space-x-2">
                     <i class="fas fa-bell"></i>
+                    @if (Auth::user()->unreadNotifications->count() > 0)
+                        <span class="text-red-500">{{ Auth::user()->unreadNotifications->count() }}</span>
+                    @endif
                 </a>
-                <a href="#" class="hover:text-gray-300 flex items-center space-x-2">
+
+
+                <a href="{{ route('profile.edit') }}" class="hover:text-gray-300 flex items-center space-x-2">
                     <i class="fas fa-user"></i>
                 </a>
                 <a href="{{ route('logout') }}" class="hover:text-gray-300 flex items-center space-x-2">

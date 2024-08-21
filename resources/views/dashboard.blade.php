@@ -7,7 +7,7 @@
         <aside class="w-full md:w-64 bg-gray-800 text-white shadow-md p-4 hidden md:block">
             <ul>
                 <li class="flex items-center mb-4">
-                    <a href="{{ route('posts.show', Auth::user()) }}" class="flex items-center">
+                    <a href="{{ route('profile.show', Auth::user()) }}" class="flex items-center">
                         <img src="{{ asset('uploads/' . Auth::user()->profile) }}" alt="Friend" class="w-10 h-10 rounded-full mr-2">
                         <p class="text-gray-300">{{ Auth::user()->name }}</p>
                     </a>
@@ -16,12 +16,16 @@
             </ul>
             <h2 class="text-xl font-semibold mb-4">Friends</h2>
             <ul>
-                <!-- Example Friend -->
-                <li class="flex items-center mb-4">
-                    <img src="https://via.placeholder.com/40" alt="Friend" class="w-10 h-10 rounded-full mr-2">
-                    <p class="text-gray-300">Abu Taher</p>
-                </li>
-                <!-- More friends here -->
+                @forelse($friends as $friend)
+                <a href="{{ route('profile.show', $friend) }}">
+                    <li class="flex items-center mb-4">
+                        <img src="{{ asset('uploads/' . $friend->profile) }}" alt="Friend" class="w-10 h-10 rounded-full mr-2">
+                        <p class="text-gray-300">{{ $friend->name }}</p>
+                    </li>
+                </a>
+                @empty
+                    <li class="text-gray-300">You have no friends yet.</li>
+                @endforelse
             </ul>
         </aside>
 
@@ -57,23 +61,54 @@
                     <!-- Post Content and Media -->
                     <ul>
                         <li class="flex items-center mb-4">
-                            <img src="{{ asset('uploads/' . $post->user->profile) }}" alt="Friend" class="w-10 h-10 rounded-full mr-2">
+                            <!-- Profile Photo with Link -->
+                            <a href="{{ route('profile.show', $post->user->id) }}" class="flex items-center">
+                                <img src="{{ asset('uploads/' . $post->user->profile) }}" alt="Friend" class="w-10 h-10 rounded-full mr-2">
+                            </a>
+
+                            <!-- Username with Link -->
                             <div>
-                                <h2 class="text-gray-400">{{ $post->user->name }}</h2>
+                                <a href="{{ route('profile.show', $post->user->id) }}" class="text-gray-400 hover:underline">
+                                    <h2>{{ $post->user->name }}</h2>
+                                </a>
                                 <span class="text-gray-500 block">{{ $post->created_at->format('F j, Y, g:i a') }}</span>
                             </div>
+
+                            <!-- Options Menu for Authenticated Users -->
+                            @if (Auth::check())
+                            <div class="ml-auto relative">
+                                <button class="text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu({{ $post->id }})">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div id="menu-{{ $post->id }}" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg hidden z-10">
+                                    @if ($post->user_id == Auth::id())
+                                    <!-- Options for authenticated user (post owner) -->
+                                    <button onclick="openEditModal({{ $post->id }})" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Edit Post</button>
+                                    <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Delete Post</button>
+                                    </form>
+                                    @else
+                                    <!-- Options for other users -->
+                                    <button class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Report Post</button>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
                         </li>
                     </ul>
+
 
                     <p class="text-white mb-4">{{ $post->content }}</p>
                     @if (Str::contains($post->media_path, ['.jpg', '.jpeg', '.png', '.gif', '.svg']))
                         <img src="{{ asset('storage/' . str_replace('public/', '', $post->media_path)) }}"
                              alt="Post Media"
-                             class="w-[250px] h-[200px] object-cover rounded-lg mb-4">
+                             class="object-cover rounded-lg mb-4">
                     @else
                         @if (Str::contains($post->media_path, ['.mp4', '.mov', '.avi']))
                             <video controls
-                                   class="w-[250px] h-[200px] object-cover rounded-lg mb-4">
+                                   class="object-cover rounded-lg mb-4">
                                 <source src="{{ asset('storage/' . str_replace('public/', '', $post->media_path)) }}"
                                         type="video/{{ pathinfo($post->media_path, PATHINFO_EXTENSION) }}">
                                 Your browser does not support the video tag.
@@ -183,17 +218,59 @@
         <aside class="w-full md:w-64 bg-gray-800 text-white shadow-md p-4 hidden md:block">
             <h2 class="text-xl font-semibold mb-4">Suggestions</h2>
             <ul>
+                @foreach ($nonFriends as $nonFriend)
                 <li class="flex items-center mb-4">
-                    <img src="https://via.placeholder.com/40" alt="Suggestion" class="w-10 h-10 rounded-full mr-2">
-                    <p class="text-gray-300">Suggested User</p>
+                    <a href="{{ route('profile.show', $nonFriend) }}" class="flex items-center">
+                    <img src="{{ asset('uploads/' . $nonFriend->profile) }}" alt="Suggestion" class="w-10 h-10 rounded-full mr-2">
+                    <p class="text-gray-300">{{ $nonFriend->name }}</p>
+                    </a>
                 </li>
-                <!-- More suggestions here -->
+                @endforeach
             </ul>
         </aside>
     </div>
 </div>
 
+<!-- Edit Modal -->
+@foreach ($posts as $post)
+<div id="edit-modal-{{ $post->id }}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 hidden">
+    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-lg">
+        <h3 class="text-lg font-semibold mb-4">Edit Post</h3>
+        <form action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
+
+            <!-- Post Content -->
+            <div class="mb-4">
+                <label for="post_content" class="block text-gray-300">Post Content</label>
+                <textarea id="post_content" name="post_content" rows="4" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white placeholder-gray-400">{{ old('post_content', $post->content) }}</textarea>
+            </div>
+
+            <!-- Media Upload -->
+            <div class="mb-4">
+                <label for="media" class="block text-gray-300">Media (optional)</label>
+                <input id="media" name="media" type="file" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white placeholder-gray-400">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mb-4">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Update Post</button>
+                <button type="button" onclick="closeEditModal({{ $post->id }})" class="ml-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endforeach
+
 <script>
+    function openEditModal(postId) {
+        document.getElementById('edit-modal-' + postId).classList.remove('hidden');
+    }
+
+    function closeEditModal(postId) {
+        document.getElementById('edit-modal-' + postId).classList.add('hidden');
+    }
+
     function toggleComments(postId) {
         const commentsSection = document.getElementById('comments-' + postId);
         commentsSection.classList.toggle('hidden');
@@ -203,5 +280,19 @@
         const form = document.getElementById('reply-form-' + postId + '-' + commentId);
         form.classList.toggle('hidden');
     }
+
+    function toggleMenu(postId) {
+        const menu = document.getElementById('menu-' + postId);
+        menu.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function(event) {
+        const menus = document.querySelectorAll('[id^="menu-"]');
+        menus.forEach(menu => {
+            if (!menu.contains(event.target) && !event.target.closest('[onclick^="toggleMenu"]')) {
+                menu.classList.add('hidden');
+            }
+        });
+    });
 </script>
 @endsection

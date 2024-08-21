@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'providers' => [
+    // Other Service Providers
+    Illuminate\Broadcasting\BroadcastServiceProvider::class,
+],
+
 
     /*
     |--------------------------------------------------------------------------
