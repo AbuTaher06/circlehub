@@ -16,5 +16,11 @@ class ShareController extends Controller
             'post_id' => $postId,
             'user_id' => Auth::id(),
         ]);
+         //Log activity
+         Activity::create([
+            'user_id' => Auth::id(),
+            'type' => 'share',
+            'description' => 'you have a new share',
+            ]);
     }
 }

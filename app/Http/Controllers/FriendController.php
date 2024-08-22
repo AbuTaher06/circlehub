@@ -25,7 +25,10 @@ class FriendController extends Controller
                              ->orWhere('friend_id', $authUser->id);
                    });
          })->get();
-  
+
+         // Log activity
+         
+
 
          // Return the dashboard view with the friends data
          return view('dashboard', [

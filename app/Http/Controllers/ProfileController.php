@@ -6,6 +6,7 @@ use App\Models\Friendship;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use App\Notifications\FriendRequestNotification;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,8 +18,9 @@ class ProfileController extends Controller
     {
         $user = User::findOrFail($id);
         $posts = $user->posts()->orderBy('created_at', 'desc')->get();
-        $authUser = Auth::user();
 
+        $authUser = Auth::user();
+        $activities =  $authUser->activities()->orderBy('created_at', 'desc')->get();
         $friendRequestStatus = 'none'; // Default status
 
         if ($authUser) {
@@ -58,6 +60,7 @@ class ProfileController extends Controller
         return view('profile.show', [
             'user' => $user,
             'posts' => $posts,
+            'activities'=>$activities,
             'friendRequestStatus' => $friendRequestStatus,
         ]);
     }
@@ -88,23 +91,24 @@ class ProfileController extends Controller
     // Handle adding a friend request
     public function addFriend(Request $request, User $user)
     {
+        // Prevent sending a request to oneself
         if ($user->id === Auth::id()) {
             return back()->withErrors(['error' => 'You cannot add yourself as a friend.']);
         }
 
+        // Check if a friendship already exists
         if ($this->friendshipExists(Auth::id(), $user->id)) {
             return back()->withErrors(['error' => 'You are already friends or a request already exists.']);
         }
 
+        // Create a new friendship request
         $friendship = Friendship::create([
             'user_id' => Auth::id(),
             'friend_id' => $user->id,
             'status' => 'pending'
         ]);
 
-        // Log notification dispatch
-        Log::info('Dispatching notification for friendship request.', ['user_id' => $user->id]);
-
+        // Notify the user
         $user->notify(new FriendRequestNotification($friendship));
 
         return back()->with('status', 'Friend request sent.');
@@ -195,5 +199,58 @@ class ProfileController extends Controller
         } else {
             return back()->withErrors(['error' => 'Friend request not found.']);
         }
+    }
+
+    public function update(Request $request){
+        $user=Auth::user();
+
+        $request->validate([
+            'profile'=>'nullable|image|max:2048',
+            'cover_photo'=>'nullable|image|max:2048',
+        ]);
+
+        if($request->hasFile('cover_photo')){
+            if($user->cover_photo){
+                Storage::delete($user->cover_photo);
+            }
+            $user->cover_photo=$request->file('cover_photo')->store('cover_photos');
+        }
+        if($request->hasFile('profile_picture')) {
+            if ($user->profile) {
+                Storage::delete($user->profile);
+            }
+            $user->profile = $request->file('profile_picture')->store('profile');
+        }
+        $user->save();
+        return redirect()->route('profile.show', $user->id)->with('status', 'Profile updated!');
+    }
+    public function editCover(User $user)
+    {
+        // Make sure the user is authorized to edit this profile
+        if (Auth::id() !== $user->id) {
+            abort(403);
+        }
+
+        return view('profile.edit-cover', compact('user'));
+    }
+
+    public function updateCover(Request $request, User $user)
+    {
+        // Make sure the user is authorized to edit this profile
+        if (Auth::id() !== $user->id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'cover_photo' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('cover_photo')) {
+            $path = $request->file('cover_photo')->store('cover_photos');
+            $user->cover_photo = $path;
+            $user->save();
+        }
+
+        return redirect()->route('profile.show', $user->id)->with('success', 'Cover photo updated successfully.');
     }
 }

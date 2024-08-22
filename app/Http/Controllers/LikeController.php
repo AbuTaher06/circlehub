@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Like;
 use App\Models\Post;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,9 +23,17 @@ class LikeController extends Controller
                 'post_id' => $postId,
                 'user_id' => Auth::id(),
             ]);
-        }
+
+             //Log activity
+             Activity::create([
+                'user_id' => Auth::id(),
+                'post_id' => $post->id,
+                'type' => 'like',
+                'description' => 'you have a new like',
+            ]);
 
         // Return back without any messages
         return redirect()->back();
     }
+}
 }

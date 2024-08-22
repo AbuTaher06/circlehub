@@ -38,6 +38,13 @@ class DashboardController extends Controller
             });
         })->where('id', '!=', $authUser->id)->get();
 
+        // Log activity
+        // $authUser->activities()->create([
+        //     'user_id' => $authUser->id,
+        //     'type' => 'dashboard',
+        //     'description' => 'Viewed the dashboard',
+        // ]);
+
         // Return the dashboard view with the posts, friends, and non-friends data
         return view('dashboard', [
             'posts' => $posts,

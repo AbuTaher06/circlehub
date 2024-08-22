@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile',
+        'cover_photo',
     ];
 
     /**
@@ -54,5 +56,9 @@ class User extends Authenticatable
     }
     public function friendsof(){
         return $this->hasMany(Friendship::class, 'friend_id');
+    }
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class);
     }
 }

@@ -60,6 +60,12 @@ Route::get('/notifications', [ProfileController::class, 'showNotifications'])->n
     Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
 });
+// routes/web.php
+
+Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activity.edit');
+Route::get('/profile/edit-cover', [ProfileController::class, 'editCover'])->name('profile.edit.cover');
+Route::patch('/profile/update-cover', [ProfileController::class, 'updateCover'])->name('profile.update.cover');
+
 
 // Authentication Routes (Login, Registration, etc.)
 require __DIR__.'/auth.php';

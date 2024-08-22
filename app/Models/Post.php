@@ -30,4 +30,8 @@ class Post extends Model
     public function shares(){
         return $this->hasMany(Share::class);
     }
+    public function activities()
+{
+    return $this->hasMany(Activity::class);
+}
 }

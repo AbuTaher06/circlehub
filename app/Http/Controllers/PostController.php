@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use Storage;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class PostController extends Controller
     }
 
     // Store a newly created post in storage
-    public function store(Request $request)
+    public function store(Request $request ,Post $post)
     {
         $validateData = $request->validate([
             'post_content' => 'nullable|string',
@@ -28,11 +29,21 @@ class PostController extends Controller
             $mediaPath = $request->file('media')->store('public/media');
         }
 
-        Post::create([
-            'user_id' => Auth::user()->id,
+        $post->create([
+            'user_id' => Auth::id(),
             'content' => $validateData['post_content'],
             'media_path' => $mediaPath,
         ]);
+
+        // Redirect to dashboard
+        
+
+        //Log activity
+        Activity::create([
+            'user_id' => Auth::id(),
+            'type' => 'post',
+            'description' => 'Created a new post',
+            ]);
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully.');
     }
