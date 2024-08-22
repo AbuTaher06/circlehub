@@ -96,5 +96,13 @@ class PostController extends Controller
 $post = Post::with('user', 'likes', 'comments.user')->findOrFail($id);
     return view('posts.show', compact('post'));
 }
+public function report($id)
+{
+    $post = Post::findOrFail($id);
+    // Implement the logic to report the post (e.g., save to a reports table, send notification, etc.)
+
+    return redirect()->back()->with('message', 'Post reported successfully.');
+}
+
 
 }

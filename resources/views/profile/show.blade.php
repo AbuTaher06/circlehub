@@ -7,7 +7,7 @@
         <!-- Cover Photo -->
         <div class="relative w-full mb-6">
             @if ($user->cover_photo)
-                <img src="{{ asset('uploads/' . $user->cover_photo) }}" alt="Cover Photo" class="w-full h-48 object-cover rounded-lg">
+                <img src="{{ asset('uploads/'. $user->cover_photo) }}" alt="Cover Photo" class="w-full h-48 object-cover rounded-lg">
             @else
                 <img src="{{ asset('default-cover.jpg') }}" alt="Default Cover Photo" class="w-full h-48 object-cover rounded-lg">
             @endif
@@ -60,59 +60,57 @@
             @endif
         </div>
         @endif
+
+        <!-- Activity Feed -->
+        <div class="w-full mt-4 flex items-center">
+            <button onclick="toggleActivityFeed()" class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-bell mr-2"></i>
+                <span>Activity Feed</span>
+            </button>
+        </div>
+        <div id="activity-feed" class="w-full mt-2 hidden">
+            @if(Auth::check() && Auth::id() === $user->id)
+                @php
+                    $activities = Auth::user()->activities()->latest()->get();
+                @endphp
+                @forelse ($activities as $activity)
+                    <div class="activity bg-gray-700 p-4 rounded-lg mb-2">
+                        @php
+                            $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
+                            $postUrl = route('posts.show', ['id' => $activity->post_id]);
+                            $profileUrl = route('profile.show', ['id' => $activity->user_id]);
+                        @endphp
+
+                        @if ($activity->type == 'like')
+                            <p>
+                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
+                                - {{ $activity->created_at->diffForHumans() }}
+                            </p>
+                        @elseif ($activity->type == 'comment')
+                            <p>
+                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
+                                - {{ $activity->created_at->diffForHumans() }}
+                            </p>
+                        @elseif ($activity->type == 'visit')
+                            <p>
+                                <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
+                                - {{ $activity->created_at->diffForHumans() }}
+                            </p>
+                        @elseif ($activity->type == 'post')
+                            <p>
+                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
+                                - {{ $activity->created_at->diffForHumans() }}
+                            </p>
+                        @endif
+                    </div>
+                @empty
+                    <p class="text-gray-400">No recent activities.</p>
+                @endforelse
+            @else
+                <p class="text-gray-400">You can only view your own activities.</p>
+            @endif
+        </div>
     </div>
-
-    <!-- Activity Feed -->
-    <div class="w-full sm:w-1/3 bg-gray-800 p-6 rounded-lg mb-6">
-        <h2 class="text-xl font-bold mb-4">Activity Feed</h2>
-
-        @if(Auth::check() && Auth::id() === $user->id)
-            @php
-                // Fetch activities of the authenticated user (who is viewing their own profile)
-                $activities = Auth::user()->activities()->latest()->get();
-            @endphp
-
-            @forelse ($activities as $activity)
-                <div class="activity bg-gray-700 p-4 rounded-lg mb-4">
-                    @php
-                        $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
-                        $postUrl = route('posts.show', ['id' => $activity->post_id]); // URL for the post
-                        $profileUrl = route('profile.show', ['id' => $activity->user_id]); // URL for the profile
-                    @endphp
-
-                    @if ($activity->type == 'like')
-                        <p>
-                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
-                            - {{ $activity->created_at->diffForHumans() }}
-                        </p>
-                    @elseif ($activity->type == 'comment')
-                        <p>
-                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
-                            - {{ $activity->created_at->diffForHumans() }}
-                        </p>
-                    @elseif ($activity->type == 'visit')
-                        <p>
-                            <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
-                            - {{ $activity->created_at->diffForHumans() }}
-                        </p>
-                    @elseif ($activity->type == 'post')
-                        <p>
-                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
-                            - {{ $activity->created_at->diffForHumans() }}
-                        </p>
-                    @endif
-                </div>
-            @empty
-                <p class="text-gray-400">No recent activities.</p>
-            @endforelse
-        @else
-            <p class="text-gray-400">You can only view your own activities.</p>
-        @endif
-    </div>
-
-
-
-
 
     <!-- Posts Section -->
     <div class="w-full sm:w-2/3 mt-6 px-2 sm:px-6 lg:px-12">
@@ -126,7 +124,7 @@
                     <ul class="mb-4">
                         <li class="flex items-center mb-4">
                             <a href="{{ route('profile.show', $post->user->id) }}" class="flex items-center">
-                                <img src="{{ Storage::url($post->user->profile) }}" alt="User Photo" class="w-10 h-10 rounded-full mr-2">
+                                <img src="{{ asset('uploads/'.$post->user->profile) }}" alt="User Photo" class="w-10 h-10 rounded-full mr-2">
                                 <div>
                                     <h2 class="text-gray-400">{{ $post->user->name }}</h2>
                                     <span class="text-gray-500 block">{{ $post->created_at->format('F j, Y, g:i a') }}</span>
@@ -260,6 +258,34 @@
             @endforeach
         @endif
     </div>
+
+    <!-- Friends Section -->
+    <div class="w-full sm:w-1/3 bg-gray-800 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold text-gray-200">Friends</h2>
+        <ul class="mt-4">
+            @forelse ($mutualFriends as $friend)
+                <li class="mb-2 flex items-center">
+                    <img src="{{ asset('uploads/' . $friend->profile) }}" alt="{{ $friend->name }}" class="w-8 h-8 rounded-full mr-2">
+                    <a href="{{ route('profile.show', $friend->id) }}" class="text-gray-300 hover:underline">{{ $friend->name }}</a>
+                </li>
+            @empty
+                <li class="text-gray-400">No mutual friends found.</li>
+            @endforelse
+        </ul>
+
+        <h2 class="text-xl font-semibold text-gray-200 mt-6">Recently Added Friends</h2>
+        <ul class="mt-4">
+            @forelse ($recentlyAddedFriends as $friend)
+                <li class="mb-2 flex items-center">
+                    <img src="{{ asset('uploads/' . $friend->profile) }}" alt="{{ $friend->name }}" class="w-8 h-8 rounded-full mr-2">
+                    <a href="{{ route('profile.show', $friend->id) }}" class="text-gray-300 hover:underline">{{ $friend->name }}</a>
+                    <span class="text-gray-500 text-sm ml-auto">{{ $friend->pivot->created_at->diffForHumans() }}</span>
+                </li>
+            @empty
+                <li class="text-gray-400">No recently added friends.</li>
+            @endforelse
+        </ul>
+    </div>
 </div>
 
 <!-- Edit Modal -->
@@ -294,6 +320,11 @@
 @endforeach
 
 <script>
+    function toggleActivityFeed() {
+        const activityFeed = document.getElementById('activity-feed');
+        activityFeed.classList.toggle('hidden');
+    }
+
     function openEditModal(postId) {
         document.getElementById('edit-modal-' + postId).classList.remove('hidden');
     }
@@ -323,18 +354,12 @@
         }
     }
 
-    function openReportModal(postId) {
-        // Implement report modal logic
-    }
-
     document.addEventListener('click', function(event) {
-        const menus = document.querySelectorAll('[id^="menu-"]');
-        menus.forEach(menu => {
-            if (!menu.contains(event.target) && !event.target.closest('[onclick^="toggleMenu"]')) {
-                menu.classList.add('hidden');
-            }
-        });
+        // Close menus when clicking outside
+        if (!event.target.closest('.menu')) {
+            document.querySelectorAll('.menu').forEach(menu => menu.classList.add('hidden'));
+        }
     });
 </script>
-
 @endsection
+

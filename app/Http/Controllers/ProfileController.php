@@ -20,7 +20,10 @@ class ProfileController extends Controller
         $posts = $user->posts()->orderBy('created_at', 'desc')->get();
 
         $authUser = Auth::user();
-        $activities =  $authUser->activities()->orderBy('created_at', 'desc')->get();
+        $activities = $authUser->activities()->orderBy('created_at', 'desc')->get();
+        $mutualFriends = $authUser->mutualFriends($user);
+        $recentlyAddedFriends = $user->recentlyAddedFriends();
+
         $friendRequestStatus = 'none'; // Default status
 
         if ($authUser) {
@@ -38,29 +41,15 @@ class ProfileController extends Controller
                 } elseif ($friendship->status === 'pending') {
                     $friendRequestStatus = ($friendship->user_id == $authUser->id) ? 'sent' : 'pending';
                 }
-            } else {
-                $pendingRequestFromAuthUser = Friendship::where('user_id', $authUser->id)
-                    ->where('friend_id', $user->id)
-                    ->where('status', 'pending')
-                    ->exists();
-
-                $pendingRequestFromOtherUser = Friendship::where('user_id', $user->id)
-                    ->where('friend_id', $authUser->id)
-                    ->where('status', 'pending')
-                    ->exists();
-
-                if ($pendingRequestFromAuthUser) {
-                    $friendRequestStatus = 'sent';
-                } elseif ($pendingRequestFromOtherUser) {
-                    $friendRequestStatus = 'pending';
-                }
             }
         }
 
         return view('profile.show', [
             'user' => $user,
             'posts' => $posts,
-            'activities'=>$activities,
+            'activities' => $activities,
+            'mutualFriends' => $mutualFriends,
+            'recentlyAddedFriends' => $recentlyAddedFriends,
             'friendRequestStatus' => $friendRequestStatus,
         ]);
     }

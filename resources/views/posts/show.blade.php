@@ -7,7 +7,7 @@
         <!-- Post Author and Timestamp -->
         <div class="flex items-center mb-4">
             <a href="{{ route('profile.show', $post->user->id) }}" class="flex items-center">
-                <img src="{{ Storage::url($post->user->profile) }}" alt="User Photo" class="w-10 h-10 rounded-full mr-2">
+                <img src="{{ asset('uploads/'. $post->user->profile) }}" alt="User Photo" class="w-10 h-10 rounded-full mr-2">
                 <div>
                     <h2 class="text-gray-400">{{ $post->user->name }}</h2>
                     <span class="text-gray-500 block">{{ $post->created_at->format('F j, Y, g:i a') }}</span>
@@ -23,11 +23,26 @@
                         <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700">Delete Post</button>
+                            <button onclick="openEditModal({{ $post->id }})" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Delete Post</button>
                         </form>
                     </div>
                 </div>
+                @else
+                <div class="ml-auto">
+                    <form action="{{ route('posts.report', $post->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="text-red-500 hover:text-red-700 focus:outline-none">
+                            <i class="fas fa-flag"></i> Report Post
+                        </button>
+                    </form>
+                </div>
+
             @endif
+
+
+
+
+
         </div>
 
         <!-- Post Content and Media -->
@@ -187,6 +202,7 @@
         function closeEditModal() {
             document.getElementById('edit-modal').classList.add('hidden');
         }
+
 
         document.addEventListener('click', function(event) {
             const menus = document.querySelectorAll('[id^="menu-"]');

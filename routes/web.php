@@ -9,6 +9,7 @@ use App\Http\Controllers\ShareController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 
@@ -62,6 +63,7 @@ Route::get('/notifications', [ProfileController::class, 'showNotifications'])->n
     // Comment Routes
     Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
 });
 // routes/web.php
 
