@@ -36,7 +36,7 @@ class PostController extends Controller
         ]);
 
         // Redirect to dashboard
-        
+
 
         //Log activity
         Activity::create([
@@ -91,12 +91,10 @@ class PostController extends Controller
     }
 
     // Show all posts (if needed)
-    public function index()
-    {
-        $posts = Post::withCount('likes', 'shares', 'comments')
-            ->where('user_id', Auth::user()->id)
-            ->latest()
-            ->get();
-        return view('posts.show', compact('posts'));
-    }
+    public function show($id)
+{
+$post = Post::with('user', 'likes', 'comments.user')->findOrFail($id);
+    return view('posts.show', compact('post'));
+}
+
 }

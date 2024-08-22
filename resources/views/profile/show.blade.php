@@ -63,54 +63,52 @@
     </div>
 
     <!-- Activity Feed -->
+    <div class="w-full sm:w-1/3 bg-gray-800 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-bold mb-4">Activity Feed</h2>
 
-  <div class="w-full sm:w-1/3 bg-gray-800 p-6 rounded-lg mb-6">
-    <h2 class="text-xl font-bold mb-4">Activity Feed</h2>
+        @if(Auth::check() && Auth::id() === $user->id)
+            @php
+                // Fetch activities of the authenticated user (who is viewing their own profile)
+                $activities = Auth::user()->activities()->latest()->get();
+            @endphp
 
-    @if(Auth::check() && Auth::id() === $user->id)
-        @php
-            // Fetch activities of the authenticated user (who is viewing their own profile)
-            $activities = Auth::user()->activities()->latest()->get();
-        @endphp
+            @forelse ($activities as $activity)
+                <div class="activity bg-gray-700 p-4 rounded-lg mb-4">
+                    @php
+                        $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
+                        $postUrl = route('posts.show', ['id' => $activity->post_id]); // URL for the post
+                        $profileUrl = route('profile.show', ['id' => $activity->user_id]); // URL for the profile
+                    @endphp
 
-        @forelse ($activities as $activity)
-            <div class="activity bg-gray-700 p-4 rounded-lg mb-4">
-                @php
-                    $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
-                    $postUrl = route('posts.show', ['post' => $activity->post_id]); // Assuming 'posts.show' is the route for viewing a post
-                    $profileUrl = route('profile.show', ['user' => $activity->user_id]); // Assuming 'profile.show' is the route for viewing a profile
-                @endphp
-
-                @if ($activity->type == 'like')
-                    <p>
-                        <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
-                        - {{ $activity->created_at->diffForHumans() }}
-                    </p>
-                @elseif ($activity->type == 'comment')
-                    <p>
-                        <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
-                        - {{ $activity->created_at->diffForHumans() }}
-                    </p>
-                @elseif ($activity->type == 'visit')
-                    <p>
-                        <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
-                        - {{ $activity->created_at->diffForHumans() }}
-                    </p>
-                @elseif ($activity->type == 'post')
-                    <p>
-                        <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
-                        - {{ $activity->created_at->diffForHumans() }}
-                    </p>
-                @endif
-            </div>
-        @empty
-            <p class="text-gray-400">No recent activities.</p>
-        @endforelse
-    @else
-        <p class="text-gray-400">You can only view your own activities.</p>
-    @endif
-</div>
-
+                    @if ($activity->type == 'like')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'comment')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'visit')
+                        <p>
+                            <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'post')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-gray-400">No recent activities.</p>
+            @endforelse
+        @else
+            <p class="text-gray-400">You can only view your own activities.</p>
+        @endif
+    </div>
 
 
 
