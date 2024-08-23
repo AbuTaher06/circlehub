@@ -26,9 +26,16 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware('auth')->group(function () {
     // Profile Routes
     Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+// p
+Route::get('/profile/edit/privacy', [ProfileController::class, 'editPrivacy'])->name('profile.edit.privacy');
+Route::post('/profile/update/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.update.privacy');
+Route::patch('/posts/{post}/privacy', [PostController::class, 'updatePrivacy'])->name('posts.updatePrivacy');
+Route::post('/profile/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.updatePrivacy');
+
 
     // Add this route to handle friend requests
    // Add this route to handle friend requests

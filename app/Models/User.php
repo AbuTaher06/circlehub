@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'profile',
         'cover_photo',
+        'post_visibility', 'friend_list_visibility', 'profile_visibility',
     ];
 
     /**

@@ -2,115 +2,157 @@
 
 @section('content')
 <div class="w-full flex flex-wrap min-h-screen bg-gray-900 text-white mt-16 px-4 sm:px-6 lg:px-12">
-    <!-- Profile Header Section -->
-    <div class="w-full bg-gray-800 p-6 rounded-lg mb-6 flex flex-col items-center">
-        <!-- Cover Photo -->
-        <div class="relative w-full mb-6">
-            @if ($user->cover_photo)
-                <img src="{{ asset('uploads/'. $user->cover_photo) }}" alt="Cover Photo" class="w-full h-48 object-cover rounded-lg">
-            @else
-                <img src="{{ asset('default-cover.jpg') }}" alt="Default Cover Photo" class="w-full h-48 object-cover rounded-lg">
-            @endif
-            @if (Auth::check() && Auth::id() === $user->id)
-                <a href="{{ route('profile.edit.cover') }}" class="absolute top-4 right-4 bg-blue-600 text-white px-2 py-1 rounded-full hover:bg-blue-700">
-                    <i class="fas fa-camera"></i>
-                </a>
-            @endif
-        </div>
-
-        <!-- Profile Picture and Edit Button -->
-        <div class="relative mb-4">
-            <img src="{{ asset('uploads/' . $user->profile) }}" alt="Profile Photo" class="w-32 h-32 rounded-full border-4 border-gray-800 shadow-md">
-            @if (Auth::check() && Auth::id() === $user->id)
-                <a href="{{ route('profile.edit') }}" class="absolute bottom-0 right-0 bg-blue-600 text-white px-2 py-1 rounded-full hover:bg-blue-700">
-                    <i class="fas fa-edit"></i>
-                </a>
-            @endif
-        </div>
-
-        <!-- User Information -->
-        <div class="text-center">
-            <h1 class="text-2xl font-bold">{{ $user->name }}</h1>
-            <p class="text-gray-400">{{ $user->email }}</p>
-        </div>
-
-        @if (Auth::check() && Auth::id() !== $user->id)
-        <div class="w-full mt-4">
-            @if ($friendRequestStatus === 'pending')
-                <div class="flex justify-center space-x-4">
-                    <form action="{{ route('friend.confirm', $user->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Confirm</button>
-                    </form>
-                    <form action="{{ route('friend.delete', $user->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</button>
-                    </form>
-                </div>
-            @elseif ($friendRequestStatus === 'sent')
-                <span class="bg-yellow-600 px-4 py-2 rounded-lg">Request Sent</span>
-            @elseif ($friendRequestStatus === 'friends')
-                <span class="bg-gray-600 px-4 py-2 rounded-lg">Friends</span>
-            @else
-                <form action="{{ route('friend.add', $user->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Add Friend</button>
-                </form>
-            @endif
-        </div>
+ <!-- Profile Header Section -->
+ <div class="w-full bg-gray-800 p-6 rounded-lg mb-6 flex flex-col items-center">
+    <!-- Cover Photo -->
+    <div class="relative w-full -mb-6">
+        @if ($user->cover_photo)
+            <img src="{{ asset('uploads/'. $user->cover_photo) }}" alt="Cover Photo" class="w-full h-48 object-cover rounded-lg">
+        @else
+            <img src="{{ asset('default-cover.jpg') }}" alt="Default Cover Photo" class="w-full h-48 object-cover rounded-lg">
         @endif
-
-        <!-- Activity Feed -->
-        <div class="w-full mt-4 flex items-center">
-            <button onclick="toggleActivityFeed()" class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                <i class="fas fa-bell mr-2"></i>
-                <span>Activity Feed</span>
-            </button>
-        </div>
-        <div id="activity-feed" class="w-full mt-2 hidden">
-            @if(Auth::check() && Auth::id() === $user->id)
-                @php
-                    $activities = Auth::user()->activities()->latest()->get();
-                @endphp
-                @forelse ($activities as $activity)
-                    <div class="activity bg-gray-700 p-4 rounded-lg mb-2">
-                        @php
-                            $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
-                            $postUrl = route('posts.show', ['id' => $activity->post_id]);
-                            $profileUrl = route('profile.show', ['id' => $activity->user_id]);
-                        @endphp
-
-                        @if ($activity->type == 'like')
-                            <p>
-                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
-                                - {{ $activity->created_at->diffForHumans() }}
-                            </p>
-                        @elseif ($activity->type == 'comment')
-                            <p>
-                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
-                                - {{ $activity->created_at->diffForHumans() }}
-                            </p>
-                        @elseif ($activity->type == 'visit')
-                            <p>
-                                <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
-                                - {{ $activity->created_at->diffForHumans() }}
-                            </p>
-                        @elseif ($activity->type == 'post')
-                            <p>
-                                <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
-                                - {{ $activity->created_at->diffForHumans() }}
-                            </p>
-                        @endif
-                    </div>
-                @empty
-                    <p class="text-gray-400">No recent activities.</p>
-                @endforelse
-            @else
-                <p class="text-gray-400">You can only view your own activities.</p>
-            @endif
-        </div>
+        @if (Auth::check() && Auth::id() === $user->id)
+            <a href="{{ route('profile.edit.cover') }}" class="absolute top-4 right-4 bg-blue-600 text-white px-2 py-1 rounded-full hover:bg-blue-700">
+                <i class="fas fa-camera"></i>
+            </a>
+        @endif
     </div>
+
+    <!-- Profile Picture and Edit Button -->
+    <div class="relative mb-2">
+        <img src="{{ asset('uploads/' . $user->profile) }}" alt="Profile Photo" class="w-32 h-32 rounded-full border-4 border-gray-800 shadow-md">
+        @if (Auth::check() && Auth::id() === $user->id)
+            <a href="{{ route('profile.edit') }}" class="absolute bottom-0 right-0 bg-blue-600 text-white px-2 py-1 rounded-full hover:bg-blue-700">
+                <i class="fas fa-edit"></i>
+            </a>
+        @endif
+    </div>
+
+    <!-- User Bio -->
+    <div class="text-center">
+        <h1 class="text-2xl font-bold">{{ $user->name }}</h1>
+        <p class="text-gray-400 mb-2">life is so short. Enjoy Your Life.</p>
+        <a href="{{ route('profile.edit') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 inline-block">Edit Bio</a>
+    </div>
+
+    @if (Auth::check() && Auth::id() !== $user->id)
+    <!-- Friend Request Status -->
+    <div class="w-full mt-4">
+        @if ($friendRequestStatus === 'pending')
+            <div class="flex justify-center space-x-4">
+                <form action="{{ route('friend.confirm', $user->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Confirm</button>
+                </form>
+                <form action="{{ route('friend.delete', $user->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</button>
+                </form>
+            </div>
+        @elseif ($friendRequestStatus === 'sent')
+            <span class="bg-yellow-600 px-4 py-2 rounded-lg">Request Sent</span>
+        @elseif ($friendRequestStatus === 'friends')
+            <span class="bg-gray-600 px-4 py-2 rounded-lg">Friends</span>
+        @else
+            <form action="{{ route('friend.add', $user->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Add Friend</button>
+            </form>
+        @endif
+    </div>
+    @endif
+
+    @auth
+    <!-- Activity Feed and Privacy Settings Buttons -->
+    <div class="w-full mt-4 flex justify-between items-center">
+        <!-- Activity Feed Button -->
+        <button onclick="toggleActivityFeed()" class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <i class="fas fa-bell mr-2"></i>
+            <span>Activity Feed</span>
+        </button>
+
+        <!-- Privacy Settings Button -->
+        @if (Auth::check() && Auth::id() === $user->id)
+        <button onclick="openPrivacyModal()" class="flex items-center bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
+            <i class="fas fa-lock mr-2"></i>
+            <span>Privacy Settings</span>
+        </button>
+        @endif
+    </div>
+
+    <!-- Activity Feed -->
+    <div id="activity-feed" class="w-full mt-2 hidden">
+        @if(Auth::check() && Auth::id() === $user->id)
+            @php
+                $activities = Auth::user()->activities()->latest()->get();
+            @endphp
+            @forelse ($activities as $activity)
+                <div class="activity bg-gray-700 p-4 rounded-lg mb-2">
+                    @php
+                        $actorName = $activity->user->id === auth()->id() ? 'You' : $activity->user->name;
+                        $postUrl = route('posts.show', ['id' => $activity->post_id]);
+                        $profileUrl = route('profile.show', ['id' => $activity->user_id]);
+                    @endphp
+
+                    @if ($activity->type == 'like')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} liked your post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'comment')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} commented on a post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'visit')
+                        <p>
+                            <a href="{{ $profileUrl }}" class="text-blue-400">{{ $actorName }} visited your profile</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @elseif ($activity->type == 'post')
+                        <p>
+                            <a href="{{ $postUrl }}" class="text-blue-400">{{ $actorName }} created a new post</a>
+                            - {{ $activity->created_at->diffForHumans() }}
+                        </p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-gray-400">No recent activities.</p>
+            @endforelse
+        @else
+            <p class="text-gray-400">You can only view your own activities.</p>
+        @endif
+    </div>
+
+    <!-- Privacy Settings Modal -->
+   <!-- Privacy Modal -->
+<div id="privacy-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-gray-800 p-6 rounded-lg w-80">
+        <h2 class="text-xl font-semibold mb-4">Change Privacy Settings</h2>
+        <form id="privacy-form" method="POST" action="">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="post_id" id="privacy-post-id">
+            <div class="mb-4">
+                <label class="block text-gray-400 mb-2">Privacy Level:</label>
+                <select name="privacy" id="privacy-select" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white">
+                    <option value="public">Public</option>
+                    <option value="friends">Friends</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Changes</button>
+            <button type="button" onclick="closePrivacyModal()" class="ml-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
+    @endauth
+
+</div>
+
 
     <!-- Posts Section -->
     <div class="w-full sm:w-2/3 mt-6 px-2 sm:px-6 lg:px-12">
@@ -137,12 +179,14 @@
                                     </button>
                                     <div id="menu-{{ $post->id }}" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg hidden z-10">
                                         <button onclick="openEditModal({{ $post->id }})" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Edit Post</button>
+                                        <button onclick="openPrivacyModal({{ $post->id }})" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Change Privacy</button>
                                         <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700">Delete Post</button>
                                         </form>
                                     </div>
+
                                 </div>
                             @endif
                         </li>
@@ -325,6 +369,45 @@
         activityFeed.classList.toggle('hidden');
     }
 
+    function openPrivacyModal(postId) {
+    document.getElementById('privacy-modal').classList.remove('hidden');
+    document.getElementById('privacy-post-id').value = postId;
+    // You may need to set the current privacy setting in the select field
+    // Fetch the current privacy setting and set it in the select field if necessary
+}
+
+function closePrivacyModal() {
+    document.getElementById('privacy-modal').classList.add('hidden');
+}
+
+document.getElementById('privacy-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const postId = form.querySelector('input[name="post_id"]').value;
+    const privacy = form.querySelector('select[name="privacy"]').value;
+
+    // Submit the privacy change
+    fetch(`/posts/${postId}/privacy`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ privacy: privacy })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closePrivacyModal();
+            location.reload(); // Refresh the page to see the updated privacy settings
+        } else {
+            alert('Failed to update privacy settings');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+
     function openEditModal(postId) {
         document.getElementById('edit-modal-' + postId).classList.remove('hidden');
     }
@@ -354,12 +437,13 @@
         }
     }
 
-    document.addEventListener('click', function(event) {
-        // Close menus when clicking outside
-        if (!event.target.closest('.menu')) {
-            document.querySelectorAll('.menu').forEach(menu => menu.classList.add('hidden'));
-        }
+    document.querySelectorAll('.edit-modal-toggle').forEach(button => {
+    button.addEventListener('click', function() {
+        const postId = button.getAttribute('data-post-id');
+        openEditModal(postId);
     });
+});
 </script>
+
 @endsection
 
