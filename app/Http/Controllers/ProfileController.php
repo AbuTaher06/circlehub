@@ -21,6 +21,7 @@ class ProfileController extends Controller
 
         $authUser = Auth::user();
         $activities = $authUser->activities()->orderBy('created_at', 'desc')->get();
+       $sharedPosts = $user->sharedPosts()->with('post.user', 'post.comments.user', 'post.likes', 'post.shares')->get(); // Fetch shared posts with necessary relationships
         $mutualFriends = $authUser->mutualFriends($user);
         $recentlyAddedFriends = $user->recentlyAddedFriends();
 
@@ -48,10 +49,24 @@ class ProfileController extends Controller
             'user' => $user,
             'posts' => $posts,
             'activities' => $activities,
+            'sharedPosts' => $sharedPosts,
             'mutualFriends' => $mutualFriends,
             'recentlyAddedFriends' => $recentlyAddedFriends,
             'friendRequestStatus' => $friendRequestStatus,
         ]);
+    }
+
+    public function updateBio(Request $request, $id)
+    {
+        $request->validate([
+            'bio' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->bio = $request->input('bio');
+        $user->save();
+
+        return redirect()->route('profile.show', ['id' => $user->id])->with('status', 'Bio updated successfully!');
     }
 
 

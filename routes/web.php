@@ -29,6 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('/profile/{id}/update-bio', [ProfileController::class, 'updateBio'])->name('profile.updateBio');
+
+
 
 // p
 Route::get('/profile/edit/privacy', [ProfileController::class, 'editPrivacy'])->name('profile.edit.privacy');
@@ -77,6 +80,8 @@ Route::get('/notifications', [ProfileController::class, 'showNotifications'])->n
 Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activity.edit');
 Route::get('/profile/edit-cover', [ProfileController::class, 'editCover'])->name('profile.edit.cover');
 Route::patch('/profile/update-cover', [ProfileController::class, 'updateCover'])->name('profile.update.cover');
+Route::patch('/posts/{post}/privacy', [PostController::class, 'updatePrivacy'])->name('posts.update.privacy');
+
 
 
 // Authentication Routes (Login, Registration, etc.)

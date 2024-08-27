@@ -31,6 +31,7 @@ class PostController extends Controller
 
         $post->create([
             'user_id' => Auth::id(),
+
             'content' => $validateData['post_content'],
             'media_path' => $mediaPath,
         ]);
@@ -42,7 +43,9 @@ class PostController extends Controller
         Activity::create([
             'user_id' => Auth::id(),
             'type' => 'post',
+
             'description' => 'Created a new post',
+            'post_id' => $post->id,
             ]);
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully.');

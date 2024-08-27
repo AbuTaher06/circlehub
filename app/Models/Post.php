@@ -13,6 +13,7 @@ class Post extends Model
         'user_id',
         'content',
         'media_path',
+
     ];
 
     public function user(){
@@ -29,6 +30,11 @@ class Post extends Model
 
     public function shares(){
         return $this->hasMany(Share::class);
+    }
+
+    public function sharedBy()
+    {
+        return $this->hasMany(Share::class, 'post_id');
     }
     public function activities()
 {

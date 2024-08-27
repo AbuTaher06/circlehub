@@ -22,10 +22,10 @@
                 <a href="{{ route('dashboard') }}" class="hover:text-gray-300 flex items-center space-x-2">
                     <i class="fas fa-home"></i>
                 </a>
-                <a href="#" class="hover:text-gray-300 flex items-center space-x-2">
+                <a href="#" class="hover:text-gray-300 flex items-center space-x-3">
                     <i class="fas fa-envelope"></i>
                 </a>
-                <a href="{{ route('notifications') }}" class="hover:text-gray-300 flex items-center space-x-2">
+                <a href="{{ route('notifications') }}" class="hover:text-gray-300 flex items-center space-x-3">
                     <i class="fas fa-bell"></i>
                     @if (Auth::user()->unreadNotifications->count() > 0)
                         <span class="text-red-500">{{ Auth::user()->unreadNotifications->count() }}</span>
@@ -33,10 +33,10 @@
                 </a>
 
 
-                <a href="{{ route('profile.edit') }}" class="hover:text-gray-300 flex items-center space-x-2">
+                <a href="{{ route('profile.show', Auth::user()) }}" class="hover:text-gray-300 flex items-center space-x-3">
                     <i class="fas fa-user"></i>
                 </a>
-                <a href="{{ route('logout') }}" class="hover:text-gray-300 flex items-center space-x-2">
+                <a href="{{ route('logout') }}" class="hover:text-gray-300 flex items-center space-x-3">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
@@ -52,10 +52,14 @@
             <a href="#" class="text-white text-xl">
                 <i class="fas fa-envelope"></i>
             </a>
-            <a href="#" class="text-white text-xl">
+            <a href="{{ route('notifications') }}" class="hover:text-white xl flex items-center space-x-3">
                 <i class="fas fa-bell"></i>
+                @if (Auth::user()->unreadNotifications->count() > 0)
+                    <span class="text-red-500">{{ Auth::user()->unreadNotifications->count() }}</span>
+                @endif
             </a>
-            <a href="#" class="text-white text-xl">
+
+            <a href="{{ route('profile.show', Auth::user()) }}" class="hover:text-gray-300 flex items-center space-x-3">
                 <i class="fas fa-user"></i>
             </a>
             <a href="{{ route('logout') }}" class="text-white text-xl">

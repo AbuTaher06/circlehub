@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function sharedPosts()
+    {
+        return $this->hasMany(Share::class, 'user_id');
+    }
+
     /**
      * Get the user's friends.
      */

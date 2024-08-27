@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('activities', function (Blueprint $table) {
-            $table->foreignId('post_id')->nullable()->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->text('bio')->nullable(); // Add the bio column
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('activities', function (Blueprint $table) {
-            $table->foreignId('post_id')->nullable(false)->change();
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 };

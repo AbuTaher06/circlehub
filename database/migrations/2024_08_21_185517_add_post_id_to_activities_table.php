@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('activities', function (Blueprint $table) {
-            $table->foreignId('post_id')->constrained()->onDelete('cascade'); // The post the action was performed on
+           // $table->foreignId('post_id')->constrained()->onDelete('cascade'); // The post the action was performed on
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('activities', function (Blueprint $table) {
-           
+
         });
     }
 };
