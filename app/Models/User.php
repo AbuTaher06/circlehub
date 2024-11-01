@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->hasMany(Share::class, 'user_id');
     }
 
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
     /**
      * Get the user's friends.
      */

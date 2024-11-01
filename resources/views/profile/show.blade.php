@@ -97,6 +97,12 @@
                 <span>Activity Feed</span>
             </button>
 
+            <a href="{{ route('messages.get', ['userId' => $user->id]) }}" class="flex items-center space-x-2 btn bg-green-600 text-white px-4 py-2 rounded-lg hover:text-gray-300">
+                {{-- <i class="fas fa-comment-dots"></i> <!-- Messenger icon --> --}}
+                <span>Send Message</span>
+            </a>
+
+
             <!-- Privacy Settings Button -->
             @if (Auth::check() && Auth::id() === $user->id)
             <button onclick="openPrivacyModal()" class="flex items-center bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">

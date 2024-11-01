@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProfileController extends Controller
 {
+
     // Display the user's profile page.
     public function show(Request $request, $id)
     {
@@ -55,6 +56,8 @@ class ProfileController extends Controller
             'friendRequestStatus' => $friendRequestStatus,
         ]);
     }
+
+
 
     public function updateBio(Request $request, $id)
     {
@@ -256,5 +259,19 @@ class ProfileController extends Controller
         }
 
         return redirect()->route('profile.show', $user->id)->with('success', 'Cover photo updated successfully.');
+    }
+
+    public function search(Request $request)
+    {
+
+        $query = $request->input('query');
+
+        // Perform the search
+        $users = User::where('name', 'LIKE', "%{$query}%")
+                       ->orWhere('email', 'LIKE', "%{$query}%")
+                       ->get();
+
+        // Return a view with the search users
+        return view('profile.search', compact('users', 'query'));
     }
 }

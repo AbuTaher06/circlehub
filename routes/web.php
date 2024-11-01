@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
@@ -22,6 +23,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+    Route::post('/user/dark-mode', [UserController::class, 'toggleDarkMode'])->name('user.dark-mode');
+    Route::get('/profile/search', [ProfileController::class, 'search'])->name('profile.search');
+
 // Authenticated Routes Group
 Route::middleware('auth')->group(function () {
     // Profile Routes
@@ -33,12 +37,15 @@ Route::middleware('auth')->group(function () {
 
 
 
+
+
 // p
 Route::get('/profile/edit/privacy', [ProfileController::class, 'editPrivacy'])->name('profile.edit.privacy');
 Route::post('/profile/update/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.update.privacy');
 Route::patch('/posts/{post}/privacy', [PostController::class, 'updatePrivacy'])->name('posts.updatePrivacy');
 Route::post('/profile/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.updatePrivacy');
 
+//Route::get('/profile/search', [ProfileController::class, 'search'])->name('profile.search');
 
     // Add this route to handle friend requests
    // Add this route to handle friend requests
@@ -74,7 +81,7 @@ Route::get('/notifications', [ProfileController::class, 'showNotifications'])->n
     Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/posts/{post}/report', [PostController::class, 'report'])->name('posts.report');
-});
+
 // routes/web.php
 
 Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activity.edit');
@@ -82,6 +89,20 @@ Route::get('/profile/edit-cover', [ProfileController::class, 'editCover'])->name
 Route::patch('/profile/update-cover', [ProfileController::class, 'updateCover'])->name('profile.update.cover');
 Route::patch('/posts/{post}/privacy', [PostController::class, 'updatePrivacy'])->name('posts.update.privacy');
 
+// Message Routes
+Route::get('/messages/{userId}', [MessageController::class, 'getMessages'])->name('messages.get');
+Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('messages.send');
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.all');
+
+
+Route::get('/notifications/new-messages', [MessageController::class, 'checkNewMessages'])->name('notifications.new-messages');
+//Route::delete('/messages/delete/{id}', [MessageController::class, 'deleteMessage'])->name('messages.delete');
+
+
+
+
+
+});
 
 
 // Authentication Routes (Login, Registration, etc.)

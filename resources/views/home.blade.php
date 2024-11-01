@@ -6,9 +6,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
     <!-- Hero Section -->
-    <div class="bg-blue-600 text-white rounded-lg shadow-lg mb-8 p-6 w-full max-w-3xl">
+    <div class="bg-blue-600 text-white rounded-lg shadow-lg mb-8 p-6 px-2 w-full max-w-3xl">
         <h1 class="text-4xl font-bold sm:text-5xl text-center">Welcome to CircleHub</h1>
         <p class="text-lg sm:text-xl mt-2 text-center">Connect with friends and share your moments.</p>
     </div>

@@ -1,0 +1,18 @@
+/* Example Tailwind configuration for dark mode */
+body {
+    @apply bg-gray-100 text-gray-900; /* Light mode styles */
+}
+
+.dark body {
+    @apply bg-green-900 text-gray-100; /* Dark mode styles */
+}
+
+/* Additional elements */
+.dark .header {
+    @apply bg-green-800 text-white;
+}
+
+/* Adjust other components for dark mode */
+.dark .container {
+    @apply bg-gray-800;
+}
